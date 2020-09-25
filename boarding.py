@@ -22,7 +22,7 @@ class Passenger(type, row, seat):
                 print()
         else:
             if self.s > self.ps:
-                if checkState(self.r, self.s - 1):
+                if not checkState(self.r, self.s - 1):
                     print()
                 # left
             else:
