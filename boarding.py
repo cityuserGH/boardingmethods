@@ -14,18 +14,30 @@ class Passenger(type, row, seat):
         self.state = 'none'
 
     def move():
-        if self.r < self.gr: # Forward
+        if self.state == 'bag':
+            self.state = 'none'
+
+        elif self.state == 'shuffle':
+            self.state = 'none'
+
+        elif self.r < self.gr: # Forward
             if not checkState(self.r + 1, 0):
                 if (self.r := self.r + 1) == self.gr:
-                    print()
-
+                    self.state = 'bag'
 
         elif self.gs > self.s: # Left
             if not checkState(self.r, self.s - 1):
-                    print()
+                self.s -= 1
+            else:
+                self.s += 1
+                self.state = 'shuffle'
 
         else: # Right
-            print()
+            if not checkState(self.r, self.s + 1):
+                self.s += 1
+            else:
+                self.s += 1
+                self.state = 'shuffle'
 
 
 def checkState(row, seat):
@@ -50,6 +62,8 @@ def moveTick():
     # When an action is taken on a passenger, they are removed from the active list.
     # They do not need to be checked again that tick.
 
+    boardingComplete = True
+
     for row in reversed(range(1, rows+1)):
         # For each row in reverse order, 30 -> 29 -> 28 etc.
         for seat in seats:
@@ -60,6 +74,14 @@ def moveTick():
                     if not (passenger.r == passenger.gr and passenger.s == passenger.gs):
                         boardingComplete = False # This cycle, a passenger has moved. Boarding is not complete.
                         passenger.move()
-                    elif passenger.state != 'seated':
+                    else:
                         passenger.state = 'seated'
     return boardingComplete # Returns the state of the boarding process.
+
+loops = 0
+
+while moveTick():
+    loops += 1
+    continue
+
+print(loops)
