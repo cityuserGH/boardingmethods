@@ -29,7 +29,7 @@ class Passenger(type, row, seat):
             if not checkState(self.r, self.s - 1):
                 self.s -= 1
             else:
-                self.s += 1
+                self.s -= 1
                 self.state = 'shuffle'
 
         else: # Right
