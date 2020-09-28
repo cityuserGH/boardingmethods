@@ -41,7 +41,7 @@ class Passenger(type, row, seat):
 
 
 def checkState(row, seat):
-    for passenger in passengers:
+    for passenger in active:
         if passenger.r == row and passenger.s == seat:
             return passenger.state
     return
@@ -78,10 +78,20 @@ def moveTick():
                         passenger.state = 'seated'
     return boardingComplete # Returns the state of the boarding process.
 
+methods = ["backToFront", "frontToBack"]
+
 loops = 0
+for method in methods:
+    while moveTick():
+        loops += 1
 
-while moveTick():
-    loops += 1
-    continue
+        if checkState(0, 0):
+            if method == "backToFront":
+                for passenger in active:
+                    
+            elif method == "frontToBack":
+                print()
 
-print(loops)
+        continue
+
+    print(method + " - " + loops)
