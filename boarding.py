@@ -2,42 +2,36 @@
 # Simulerar ombordsstigningen av ett flypglan
 # baserat på olika sätt att ordna passagerarna.
 
+import methods
+
 passengers = []
 
 class Passenger(type, row, seat):
-    def __init__(self, row, seat):
+    def __init__(self):
         self.t = type
-        self.gr = row
-        self.gs = seat
-        self.r = 0
-        self.s = 0
+        self.gr = row # Goal Row
+        self.gs = seat # Goal Seat
+        self.r = 0 # Current Row
+        self.s = 0 # Current Seat
         self.state = 'none'
 
-    def move():
+    def move(self):
         if self.state == 'bag':
             self.state = 'none'
 
-        elif self.state == 'shuffle':
-            self.state = 'none'
-
+        # Passenger is going forward
         elif self.r < self.gr: # Forward
             if not checkState(self.r + 1, 0):
                 if (self.r := self.r + 1) == self.gr:
                     self.state = 'bag'
 
-        elif self.gs > self.s: # Left
-            if not checkState(self.r, self.s - 1):
-                self.s -= 1
-            else:
-                self.s -= 1
-                self.state = 'shuffle'
+        # Passenger is going left
+        elif self.gs > self.s:
+            self.s -= 1
 
-        else: # Right
-            if not checkState(self.r, self.s + 1):
-                self.s += 1
-            else:
-                self.s += 1
-                self.state = 'shuffle'
+        # Passenger is going right
+        else:
+            self.s += 1
 
 
 def checkState(row, seat):
@@ -52,7 +46,6 @@ seats = [-3, 3, -2, 2, -1, 1] # from -3 to 3 bar 0
 # Populating list
 for row in range(1, rows+1):
     for seat in seats:
-        # Setting goalRow to row
         passengers.insert(Passenger('default', row, seat))
 
 # One move cycle
@@ -78,17 +71,17 @@ def moveTick():
                         passenger.state = 'seated'
     return boardingComplete # Returns the state of the boarding process.
 
-methods = ["backToFront", "frontToBack"]
+#methods = ["backToFront", "frontToBack"]
 
 loops = 0
-for method in methods:
+for method in methods: # Not correct
     while moveTick():
         loops += 1
 
         if checkState(0, 0):
             if method == "backToFront":
                 for passenger in active:
-                    
+
             elif method == "frontToBack":
                 print()
 
