@@ -6,11 +6,11 @@ import methods
 
 passengers = []
 
-class Passenger(type, row, seat):
-    def __init__(self):
+class Passenger:
+    def __init__(self, type, row, seat):
         self.t = type
-        self.gr = row # Goal Row
-        self.gs = seat # Goal Seat
+        self.gr = row # Goal Row (Assigned Row)
+        self.gs = seat # Goal Seat (Assigned Seat)
         self.r = 0 # Current Row
         self.s = 0 # Current Seat
         self.state = 'none'
@@ -22,11 +22,12 @@ class Passenger(type, row, seat):
         # Passenger is going forward
         elif self.r < self.gr: # Forward
             if not checkState(self.r + 1, 0):
-                if (self.r := self.r + 1) == self.gr:
+                self.r += 1
+                if self.r == self.gr:
                     self.state = 'bag'
 
         # Passenger is going left
-        elif self.gs > self.s:
+        elif self.gs < self.s:
             self.s -= 1
 
         # Passenger is going right
@@ -35,7 +36,7 @@ class Passenger(type, row, seat):
 
 
 def checkState(row, seat):
-    for passenger in active:
+    for passenger in passengers: # Want 2nd to be active list
         if passenger.r == row and passenger.s == seat:
             return passenger.state
     return
@@ -46,45 +47,56 @@ seats = [-3, 3, -2, 2, -1, 1] # from -3 to 3 bar 0
 # Populating list
 for row in range(1, rows+1):
     for seat in seats:
-        passengers.insert(Passenger('default', row, seat))
+        passengers.insert(0, Passenger('default', row, seat))
+
+seats = [-3, 3, -2, 2, -1, 1, 0]
 
 # One move cycle
 def moveTick():
-    active = passengers
+    print("Move tick")
+
     # List "active". Starts out identical to passengers.
     # When an action is taken on a passenger, they are removed from the active list.
     # They do not need to be checked again that tick.
 
     boardingComplete = True
+    print(boardingComplete)
 
-    for row in reversed(range(1, rows+1)):
+    for row in reversed(range(1, loops+2)): # Changing rows to loops, hm
         # For each row in reverse order, 30 -> 29 -> 28 etc.
         for seat in seats:
+            #print("Row: " + str(row) + " Seat: " + str(seat))
             # For each seat in that row, check if there is a passenger there.
-            for passenger in active:
+            for passenger in passengers:
+                #print("Found a passenger")
+                #print("Checking passenger, row " + str(passenger.r) + " seat " + str(passenger.s) + "... goal row " + str(passenger.gr) + " goal seat " + str(passenger.gs))
                 if (passenger.r == row) and (passenger.s == seat):
-                    active.remove(passenger)
+                    #print("Matched.")
                     if not (passenger.r == passenger.gr and passenger.s == passenger.gs):
                         boardingComplete = False # This cycle, a passenger has moved. Boarding is not complete.
                         passenger.move()
+                        #active.remove(passenger)
+                        #print("Moved. New position, row " + str(passenger.r) + " seat " + str(passenger.s))
                     else:
                         passenger.state = 'seated'
+                        #active.remove(passenger)
+                #else:
+                #    print("Did not match.")
+    print(boardingComplete)
     return boardingComplete # Returns the state of the boarding process.
 
 #methods = ["backToFront", "frontToBack"]
 
+passengers = methods.backToFront(passengers)
+passengers[0].move()
+# First in sorted manifest moves
+
 loops = 0
-for method in methods: # Not correct
-    while moveTick():
-        loops += 1
 
-        if checkState(0, 0):
-            if method == "backToFront":
-                for passenger in active:
+while not moveTick():
+    print("Loop " + str(loops))
+    if loops < 180:
+        passengers[loops].r = 1
+    loops += 1
 
-            elif method == "frontToBack":
-                print()
-
-        continue
-
-    print(method + " - " + loops)
+print("FINISHED! Loops: " + str(loops))
