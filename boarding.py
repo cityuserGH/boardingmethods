@@ -53,14 +53,12 @@ seats = [-3, 3, -2, 2, -1, 1, 0]
 
 # One move cycle
 def moveTick():
-    print("Move tick")
 
     # List "active". Starts out identical to passengers.
     # When an action is taken on a passenger, they are removed from the active list.
     # They do not need to be checked again that tick.
 
     boardingComplete = True
-    print(boardingComplete)
 
     for row in reversed(range(1, loops+2)): # Changing rows to loops, hm
         # For each row in reverse order, 30 -> 29 -> 28 etc.
@@ -82,12 +80,11 @@ def moveTick():
                         #active.remove(passenger)
                 #else:
                 #    print("Did not match.")
-    print(boardingComplete)
     return boardingComplete # Returns the state of the boarding process.
 
 #methods = ["backToFront", "frontToBack"]
 
-passengers = methods.backToFront(passengers)
+passengers = methods.frontToBack(passengers)
 passengers[0].move()
 # First in sorted manifest moves
 
