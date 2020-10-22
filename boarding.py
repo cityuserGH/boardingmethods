@@ -2,11 +2,10 @@
 # Simulerar ombordsstigningen av ett flypglan
 # baserat på olika sätt att ordna passagerarna.
 
-import methods
-import random
+import methods, random, time
 
 passengers = []
-rows = 30
+rows = 5
 
 class Passenger:
     def __init__(self, type, row, seat):
@@ -50,6 +49,8 @@ def moveTick():
     # They do not need to be checked again that tick.
 
     boardingComplete = True
+    seats = [-3, 3, -2, 2, -1, 1, 0]
+
 
     for row in reversed(range(1, rows+1)):
         # For each row in reverse order, 30 -> 29 -> 28 etc.
@@ -75,7 +76,7 @@ def moveTick():
 
 #methods = ["backToFront", "frontToBack"]
 
-for i in range(10):
+for i in range(1):
 
     # Populating list <- THIS SHOULDN'T BE HERE!!!!!!
     passengers = []
@@ -84,7 +85,7 @@ for i in range(10):
         for seat in seats:
             passengers.insert(0, Passenger('default', row, seat))
 
-    seats = [-3, 3, -2, 2, -1, 1, 0]
+    #seats = [-3, 3, -2, 2, -1, 1, 0]
 
 
     random.shuffle(passengers) # Randomly shuffles list before sorting via method
@@ -96,10 +97,34 @@ for i in range(10):
     passengers[0].move() # First in sorted manifest moves from 0,0 to row 1, seat 0.
 
     loops = 0
+    enterIndex = 0
     while not moveTick(): # Loops if boarding is not complete
         #print("Loop " + str(loops))
-        if loops < 180:
-            passengers[loops].r = 1
         loops += 1
+
+        if enterIndex < ( rows*6 ):
+            if not checkState(1, 0):
+                passengers[enterIndex].r = 1
+                if passengers[enterIndex].gr == 1:
+                    passengers[enterIndex].state = 'bag'
+                enterIndex += 1
+
+        for row in range(1, rows+1):
+            seatString = ""
+
+            seats = [-3, -2, -1, 0, 1, 2 , 3]
+            for seat in seats:
+                seatState = checkState(row, seat)
+
+                if seatState == 'bag':
+                    seatString += "B"
+                elif seatState:
+                    seatString += "x"
+                else:
+                    seatString += "_"
+
+            print(seatString)
+        print("#######")
+        time.sleep(0.7)
 
     print(str(i+1) + " - Loops: " + str(loops))
