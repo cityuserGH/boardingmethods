@@ -3,8 +3,10 @@
 # baserat på olika sätt att ordna passagerarna.
 
 import methods
+import random
 
 passengers = []
+rows = 30
 
 class Passenger:
     def __init__(self, type, row, seat):
@@ -34,22 +36,11 @@ class Passenger:
         else:
             self.s += 1
 
-
 def checkState(row, seat):
     for passenger in passengers: # Want 2nd to be active list
         if passenger.r == row and passenger.s == seat:
             return passenger.state
     return
-
-rows = 30
-seats = [-3, 3, -2, 2, -1, 1] # from -3 to 3 bar 0
-
-# Populating list
-for row in range(1, rows+1):
-    for seat in seats:
-        passengers.insert(0, Passenger('default', row, seat))
-
-seats = [-3, 3, -2, 2, -1, 1, 0]
 
 # One move cycle
 def moveTick():
@@ -60,7 +51,7 @@ def moveTick():
 
     boardingComplete = True
 
-    for row in reversed(range(1, loops+2)): # Changing rows to loops, hm
+    for row in reversed(range(1, rows+1)):
         # For each row in reverse order, 30 -> 29 -> 28 etc.
         for seat in seats:
             #print("Row: " + str(row) + " Seat: " + str(seat))
@@ -84,16 +75,31 @@ def moveTick():
 
 #methods = ["backToFront", "frontToBack"]
 
-passengers = methods.frontToBack(passengers)
-passengers[0].move()
-# First in sorted manifest moves
+for i in range(10):
 
-loops = 0
+    # Populating list <- THIS SHOULDN'T BE HERE!!!!!!
+    passengers = []
+    for row in range(1, rows+1):
+        seats = [-3, 3, -2, 2, -1, 1] # from -3 to 3 except for 0
+        for seat in seats:
+            passengers.insert(0, Passenger('default', row, seat))
 
-while not moveTick():
-    print("Loop " + str(loops))
-    if loops < 180:
-        passengers[loops].r = 1
-    loops += 1
+    seats = [-3, 3, -2, 2, -1, 1, 0]
 
-print("FINISHED! Loops: " + str(loops))
+
+    random.shuffle(passengers) # Randomly shuffles list before sorting via method
+    # Why does this make it variable?
+
+
+    passengers = methods.backToFront(passengers, rows)
+
+    passengers[0].move() # First in sorted manifest moves from 0,0 to row 1, seat 0.
+
+    loops = 0
+    while not moveTick(): # Loops if boarding is not complete
+        #print("Loop " + str(loops))
+        if loops < 180:
+            passengers[loops].r = 1
+        loops += 1
+
+    print(str(i+1) + " - Loops: " + str(loops))

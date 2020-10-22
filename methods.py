@@ -1,18 +1,18 @@
 # methods.py
 # Contains the sorting functions for the various boarding methods
 
-def frontToBack(manifest):
+def backToFront(manifest, rows):
     sorted = []
-    for i in range(30):
+    for row in range(1, rows+1):
         for passenger in manifest:
-            if passenger.r == i:
+            if passenger.gr == row:
                 sorted.insert(0, passenger)
     return sorted
 
-def backToFront(manifest):
-    sorted = frontToBack(manifest)
+def frontToBack(manifest, rows):
+    sorted = backToFront(manifest, rows)
     sorted.reverse()
     return sorted
 
-def perfectSteffen(manifest):
+def perfectSteffen():
     return
