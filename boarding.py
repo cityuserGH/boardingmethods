@@ -2,10 +2,30 @@
 # Simulerar ombordsstigningen av ett flypglan
 # baserat på olika sätt att ordna passagerarna.
 
-import methods, random, time
+import methods, random, time, copy, math
+
+# Settings
+animationEnabled = True
+animationSpeed = 0.9 # 0 to 1, 0 is inf time, 1 is 0 time
+
+rows = 10
+loopsPerMethod = 1
+
+methodList = [
+              #"random",
+              "BTF"
+              #"FTB",
+              #"WMA",
+              #"WMA_BTF",
+              #"WMA_BTF_ALT"
+             ]
+
+
 
 passengers = []
-rows = 5
+animationSpeed = -math.log(animationSpeed, 10)
+
+print("-- Boarding Methods --")
 
 class Passenger:
     def __init__(self, type, row, seat):
@@ -41,90 +61,102 @@ def checkState(row, seat):
             return passenger.state
     return
 
-# One move cycle
-def moveTick():
-
-    # List "active". Starts out identical to passengers.
-    # When an action is taken on a passenger, they are removed from the active list.
-    # They do not need to be checked again that tick.
-
-    boardingComplete = True
-    seats = [-3, 3, -2, 2, -1, 1, 0]
+# Populating list
+print("Populating passenger list...")
+unsortedPassengerList = []
+for row in range(1, rows+1):
+    seats = [-3, 3, -2, 2, -1, 1] # from -3 to 3 except for 0
+    for seat in seats:
+        unsortedPassengerList.insert(0, Passenger('default', row, seat))
 
 
-    for row in reversed(range(1, rows+1)):
-        # For each row in reverse order, 30 -> 29 -> 28 etc.
-        for seat in seats:
-            #print("Row: " + str(row) + " Seat: " + str(seat))
-            # For each seat in that row, check if there is a passenger there.
-            for passenger in passengers:
-                #print("Found a passenger")
-                #print("Checking passenger, row " + str(passenger.r) + " seat " + str(passenger.s) + "... goal row " + str(passenger.gr) + " goal seat " + str(passenger.gs))
-                if (passenger.r == row) and (passenger.s == seat):
-                    #print("Matched.")
-                    if not (passenger.r == passenger.gr and passenger.s == passenger.gs):
-                        boardingComplete = False # This cycle, a passenger has moved. Boarding is not complete.
-                        passenger.move()
-                        #active.remove(passenger)
-                        #print("Moved. New position, row " + str(passenger.r) + " seat " + str(passenger.s))
-                    else:
-                        passenger.state = 'seated'
-                        #active.remove(passenger)
-                #else:
-                #    print("Did not match.")
-    return boardingComplete # Returns the state of the boarding process.
-
-#methods = ["backToFront", "frontToBack"]
-
-for i in range(1):
-
-    # Populating list <- THIS SHOULDN'T BE HERE!!!!!!
-    passengers = []
-    for row in range(1, rows+1):
-        seats = [-3, 3, -2, 2, -1, 1] # from -3 to 3 except for 0
-        for seat in seats:
-            passengers.insert(0, Passenger('default', row, seat))
-
-    #seats = [-3, 3, -2, 2, -1, 1, 0]
 
 
-    random.shuffle(passengers) # Randomly shuffles list before sorting via method
-    # Why does this make it variable?
+for currentMethod in methodList:
+    print("\nNow running method: " + currentMethod)
+
+    totalLoops = 0
+
+    for i in range(loopsPerMethod):
+        passengers = copy.deepcopy(unsortedPassengerList)
+
+        random.shuffle(passengers) # Randomly shuffles list before sorting via method
+        passengers = getattr(methods, currentMethod)(passengers)
+
+        passengers[0].r = 1
+        passengers[0].state = 'bag'
+
+        loops = 0
+        enterIndex = 1
+
+        boardingComplete = False
+        while not boardingComplete: # Loops if boarding is not complete
+            boardingComplete = True
+            # ...great
 
 
-    passengers = methods.backToFront(passengers, rows)
+            # Calculates appropriate move calls
+            seats = [-3, 3, -2, 2, -1, 1, 0]
+            for row in reversed(range(1, rows+1)):
+                # For each row in reverse order, 30 -> 29 -> 28 etc.
+                for seat in seats:
+                    #print("Row: " + str(row) + " Seat: " + str(seat))
+                    # For each seat in that row, check if there is a passenger there.
+                    for passenger in passengers:
+                        #print("Found a passenger")
+                        #print("Checking passenger, row " + str(passenger.r) + " seat " + str(passenger.s) + "... goal row " + str(passenger.gr) + " goal seat " + str(passenger.gs))
+                        if (passenger.r == row) and (passenger.s == seat):
+                            #print("Matched.")
+                            if not (passenger.r == passenger.gr and passenger.s == passenger.gs):
+                                boardingComplete = False # This cycle, a passenger has moved. Boarding is not complete.
+                                passenger.move()
+                                #active.remove(passenger)
+                                #print("Moved. New position, row " + str(passenger.r) + " seat " + str(passenger.s))
+                            else:
+                                passenger.state = 'seated'
+                                #active.remove(passenger)
+                        #else:
+                        #    print("Did not match.")
+            ###
 
-    passengers[0].move() # First in sorted manifest moves from 0,0 to row 1, seat 0.
+            # Lets a new passenger enter
+            if enterIndex < (rows * 6):
+                boardingComplete = False
+                if not checkState(1, 0):
+                    passengers[enterIndex].r = 1
+                    if passengers[enterIndex].gr == 1:
+                        passengers[enterIndex].state = 'bag'
+                    enterIndex += 1
+            ###
 
-    loops = 0
-    enterIndex = 0
-    while not moveTick(): # Loops if boarding is not complete
-        #print("Loop " + str(loops))
-        loops += 1
+            if boardingComplete:
+                break
 
-        if enterIndex < ( rows*6 ):
-            if not checkState(1, 0):
-                passengers[enterIndex].r = 1
-                if passengers[enterIndex].gr == 1:
-                    passengers[enterIndex].state = 'bag'
-                enterIndex += 1
+            loops += 1
 
-        for row in range(1, rows+1):
-            seatString = ""
+            # Renders animation
+            if animationEnabled:
+                for row in range(1, rows+1):
+                    seatString = ""
 
-            seats = [-3, -2, -1, 0, 1, 2 , 3]
-            for seat in seats:
-                seatState = checkState(row, seat)
+                    seats = [-3, -2, -1, 0, 1, 2 , 3]
+                    for seat in seats:
+                        seatState = checkState(row, seat)
 
-                if seatState == 'bag':
-                    seatString += "B"
-                elif seatState:
-                    seatString += "x"
-                else:
-                    seatString += "_"
+                        if seatState == 'bag':
+                            seatString += "B"
+                        elif seatState:
+                            seatString += "x"
+                        else:
+                            seatString += "_"
 
-            print(seatString)
-        print("#######")
-        time.sleep(0.7)
+                    print(seatString)
+                print("#######")
+                time.sleep(animationSpeed)
+            ###
+        print(str(i+1) + " - Loops: " + str(loops))
+        totalLoops += loops
+    ###
 
-    print(str(i+1) + " - Loops: " + str(loops))
+    average = totalLoops / loopsPerMethod
+    print(currentMethod + " average: " + str(average))
