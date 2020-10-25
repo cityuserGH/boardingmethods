@@ -1,3 +1,3 @@
 # Boarding Methods
 
-May include boarding methods.
+**Warning:** May include boarding methods.
