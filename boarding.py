@@ -6,7 +6,7 @@ import methods, random, time, copy, math
 
 # Settings
 animationEnabled = True
-animationSpeed = 0.7 # 0 to 1, 0 is inf time, 1 is 0 time
+animationSpeed = 0.6 # 0 to 1, 0 is inf time, 1 is 0 time
 
 rows = 10
 loopsPerMethod = 1
@@ -16,8 +16,9 @@ methodList = [
               #"BTF",
               #"FTB",
               #"WMA",
-              #"WMA_BTF",
-              "WMA_BTF_ALT"
+              "WMA_BTF",
+              "WMA_BTF_ALT",
+              "perfectSteffen"
              ]
 
 
