@@ -22,5 +22,6 @@ def WMA_BTF_ALT(manifest): # Window Middle Aisle, Back To Front, Alternating sid
         #-abs(x) behaviour for x > -0.25
         #-abs(x + 0.5) behaviour for x < -0.25
 
-def perfectSteffen():
-    return
+def perfectSteffen(manifest):
+    #return sorted(manifest, key = lambda p: (-abs(p.gs + 0.25) + 0.25, p.gr % 2, -p.gr))
+    return sorted(manifest, key = lambda p: (-abs(p.gs), p.gr % 2, -p.gs, -p.gr))
