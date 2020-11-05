@@ -5,23 +5,21 @@
 import methods, random, time, copy, math
 
 # Settings
-animationEnabled = True
-animationSpeed = 0.6 # 0 to 1, 0 is inf time, 1 is 0 time
+animationEnabled = False
+animationSpeed = 0.9 # 0 to 1, 0 is inf time, 1 is 0 time
 
 rows = 10
-loopsPerMethod = 1
+loopsPerMethod = 5
 
 methodList = [
-              #"random",
-              #"BTF",
-              #"FTB",
-              #"WMA",
+              "random",
+              "BTF",
+              "FTB",
+              "WMA",
               "WMA_BTF",
               "WMA_BTF_ALT",
               "perfectSteffen"
              ]
-
-
 
 passengers = []
 animationSpeed = -math.log(animationSpeed, 10)
@@ -90,13 +88,11 @@ for currentMethod in methodList:
         loops = 0
         enterIndex = 1
 
-        boardingComplete = False
-        while not boardingComplete: # Loops if boarding is not complete
+        while True: # Loops if boarding is not complete
             boardingComplete = True
-            # ...great
+            loops += 1
 
-
-            # Calculates appropriate move calls
+            # Calculates appropriate calls to Passenger.move() method
             seats = [-3, 3, -2, 2, -1, 1, 0]
             for row in reversed(range(1, rows+1)):
                 # For each row in reverse order, 30 -> 29 -> 28 etc.
@@ -108,14 +104,16 @@ for currentMethod in methodList:
                         #print("Checking passenger, row " + str(passenger.r) + " seat " + str(passenger.s) + "... goal row " + str(passenger.gr) + " goal seat " + str(passenger.gs))
                         if (passenger.r == row) and (passenger.s == seat):
                             #print("Matched.")
-                            if not (passenger.r == passenger.gr and passenger.s == passenger.gs):
-                                boardingComplete = False # This cycle, a passenger has moved. Boarding is not complete.
+                            if not (passenger.state == "seated"):
+                                #boardingComplete = False
                                 passenger.move()
                                 #active.remove(passenger)
                                 #print("Moved. New position, row " + str(passenger.r) + " seat " + str(passenger.s))
-                            else:
-                                passenger.state = 'seated'
-                                #active.remove(passenger)
+                                if (passenger.r == passenger.gr and passenger.s == passenger.gs):
+                                    passenger.state = "seated"
+                                    #active.remove(passenger)
+                                else:
+                                    boardingComplete = False # This cycle, a passenger has moved to NOT their seat. Boarding is not complete.
                         #else:
                         #    print("Did not match.")
             ###
@@ -130,13 +128,11 @@ for currentMethod in methodList:
                     enterIndex += 1
             ###
 
-            if boardingComplete:
-                break
 
-            loops += 1
 
             # Renders animation
             if animationEnabled:
+                #print("Animation for loop " + str(loops))
                 for row in range(1, rows+1):
                     seatString = ""
 
@@ -155,6 +151,14 @@ for currentMethod in methodList:
                 print("#######")
                 time.sleep(animationSpeed)
             ###
+
+            # Breaks loop if boarding is complete
+            #print(str(boardingComplete) + " " + str(enterIndex) + " " + str(loops))
+            if boardingComplete:
+                break
+
+
+
         print(str(i+1) + " - Loops: " + str(loops))
         totalLoops += loops
     ###
