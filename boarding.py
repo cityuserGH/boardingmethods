@@ -6,7 +6,7 @@ import methods, random, time, copy, math
 
 # Settings
 animationEnabled = False
-animationSpeed = 0.9 # 0 to 1, 0 is inf time, 1 is 0 time
+animationSpeed = 0.9 # 0 to 1
 
 rows = 10
 loopsPerMethod = 5
