@@ -68,9 +68,6 @@ for row in range(1, rows+1):
     for seat in seats:
         unsortedPassengerList.insert(0, Passenger('default', row, seat))
 
-
-
-
 for currentMethod in methodList:
     print("\nNow running method: " + currentMethod)
 
@@ -97,26 +94,15 @@ for currentMethod in methodList:
             for row in reversed(range(1, rows+1)):
                 # For each row in reverse order, 30 -> 29 -> 28 etc.
                 for seat in seats:
-                    #print("Row: " + str(row) + " Seat: " + str(seat))
                     # For each seat in that row, check if there is a passenger there.
                     for passenger in passengers:
-                        #print("Found a passenger")
-                        #print("Checking passenger, row " + str(passenger.r) + " seat " + str(passenger.s) + "... goal row " + str(passenger.gr) + " goal seat " + str(passenger.gs))
                         if (passenger.r == row) and (passenger.s == seat):
-                            #print("Matched.")
                             if not (passenger.state == "seated"):
-                                #boardingComplete = False
                                 passenger.move()
-                                #active.remove(passenger)
-                                #print("Moved. New position, row " + str(passenger.r) + " seat " + str(passenger.s))
                                 if (passenger.r == passenger.gr and passenger.s == passenger.gs):
                                     passenger.state = "seated"
-                                    #active.remove(passenger)
                                 else:
                                     boardingComplete = False # This cycle, a passenger has moved to NOT their seat. Boarding is not complete.
-                        #else:
-                        #    print("Did not match.")
-            ###
 
             # Lets a new passenger enter
             if enterIndex < (rows * 6):
@@ -126,13 +112,9 @@ for currentMethod in methodList:
                     if passengers[enterIndex].gr == 1:
                         passengers[enterIndex].state = 'bag'
                     enterIndex += 1
-            ###
-
-
 
             # Renders animation
             if animationEnabled:
-                #print("Animation for loop " + str(loops))
                 for row in range(1, rows+1):
                     seatString = ""
 
@@ -150,18 +132,13 @@ for currentMethod in methodList:
                     print(seatString)
                 print("#######")
                 time.sleep(animationSpeed)
-            ###
 
             # Breaks loop if boarding is complete
-            #print(str(boardingComplete) + " " + str(enterIndex) + " " + str(loops))
             if boardingComplete:
                 break
 
-
-
         print(str(i+1) + " - Loops: " + str(loops))
         totalLoops += loops
-    ###
 
     average = totalLoops / loopsPerMethod
     print(currentMethod + " average: " + str(average))
